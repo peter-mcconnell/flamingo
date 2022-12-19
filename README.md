@@ -1,6 +1,6 @@
 # Flamegraph Generator
 
-This is a Go script that generates a flamegraph of the performance of a process with a given PID when run with the `--pid` flag.
+This is a Go script that generates a flamegraph of the performance of a process with a given PID when run with the `--pid` flag. It does nothing intelligent - just a wrapper for perf and flamegraph.
 
 ## Prerequisites
 
