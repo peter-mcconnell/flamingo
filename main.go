@@ -39,9 +39,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	// parse the --pid flag
+	// parse the flags
 	fmt.Println("parsing flags ...")
 	pidFlag := flag.Int("pid", 0, "process ID to generate flamegraph for")
+	sleepFlag := flag.Int("s", 10, "sample duration in seconds")
+	widthFlag := flag.Int("w", 2000, "flamegraph width")
 	flag.Parse()
 
 	if *pidFlag == 0 {
@@ -59,7 +61,9 @@ func main() {
 	// run perf and generate a flamegraph
 	fmt.Println("running perf ...")
 	pidStr := strconv.Itoa(*pidFlag)
-	perfOut, err := exec.Command("perf", "record", "-a", "-g", "--pid", pidStr, "sleep", "10").CombinedOutput()
+	sleepStr := strconv.Itoa(*sleepFlag)
+	widthStr := strconv.Itoa(*widthFlag)
+	perfOut, err := exec.Command("perf", "record", "-a", "-g", "--pid", pidStr, "sleep", sleepStr).CombinedOutput()
 	fmt.Printf("got: %s\n", perfOut)
 	if err != nil {
 		fmt.Printf("failed when running perf\n", err)
@@ -68,7 +72,7 @@ func main() {
 	}
 
 	fmt.Println("running flamegraph...")
-	cmd := "perf script -f | stackcollapse-perf.pl | flamegraph.pl --color=java --hash --title=Flamegraph --width=2000"
+	cmd := fmt.Sprintf("perf script -f | stackcollapse-perf.pl | flamegraph.pl --color=java --hash --title=Flamegraph --width=%s", widthStr)
 	flamegraphOut, err := exec.Command("sh", "-c", cmd).CombinedOutput()
 	if err != nil {
 		fmt.Println(err)
